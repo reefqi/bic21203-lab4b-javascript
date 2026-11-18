@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab 4b - Q2: Book Directory</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    .error { color: #d9534f; font-weight: bold; }
+    .book-group { margin-bottom: 0.75rem; }
+  </style>
+</head>
+<body>
+  <h1>Book Records</h1>
+  <div id="displayArea">
+    <p><strong>First Book Title:</strong> <span id="firstBookTitle"></span></p>
+    <p><strong>Second Book Author:</strong> <span id="secondBookAuthor"></span></p>
+    <h3>Genres Grouped by Title:</h3>
+    <div id="genresList"></div>
+  </div>
+  <p id="errorMessage" class="error" role="alert"></p>
+
+  <script>
+    async function loadBooks() {
+      const errorEl = document.getElementById("errorMessage");
+      const titleEl = document.getElementById("firstBookTitle");
+      const authorEl = document.getElementById("secondBookAuthor");
+      const genresList = document.getElementById("genresList");
+
+      try {
+        const response = await fetch("books.json");
+        if (!response.ok) {
+          throw new Error(`Failed to load file (Status: ${response.status})`);
+        }
+        
+        const data = await response.json();
+        const books = data.books;
+
+        if (!Array.isArray(books) || books.length < 2) {
+          throw new Error("Invalid or incomplete books dataset structure.");
+        }
+
+        // (a) Title of the first book
+        titleEl.textContent = books[0].title;
+
+        // (b) Author of the second book
+        authorEl.textContent = books[1].author;
+
+        // (c) Genres of both books, grouped by title
+        genresList.textContent = "";
+        books.forEach((book) => {
+          const item = document.createElement("p");
+          item.className = "book-group";
+          item.textContent = `${book.title} — ${book.genres.join(", ")}`;
+          genresList.appendChild(item);
+        });
+
+      } catch (err) {
+        errorEl.textContent = `Error loading book records: ${err.message}`;
+      }
+    }
+
+    loadBooks();
+  </script>
+</body>
+</html>
